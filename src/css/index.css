@@ -1,0 +1,10 @@
+#box{
+  width: 800px;
+  height: 500px;
+  border: 5px solid #999;
+  color: red;
+  /* background: green; */
+  background-size: contain;
+  background-image: url(../images/400x700.png);
+  /* background-image: url(https://via.placeholder.com/150); */
+}
