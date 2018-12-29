@@ -36,6 +36,7 @@ module.exports = {
       // 打包后的html文件名
       filename: 'index2.html'
     }),
+    // 未设定chunks属性则默认引入全部chuncks
     new HtmlWebpackPlugin({
       title: 'index',
       template: './src/template.html',
@@ -46,7 +47,7 @@ module.exports = {
     new webpack.HotModuleReplacementPlugin(),
     new MiniCssExtractPlugin({
       // 指生成css文件夹, 文件在此文件夹内; 文件目录会放入output.path里
-      filename: 'css/index.css'
+      filename: 'css/[name].css'
     })
   ],
   module: {
@@ -64,11 +65,24 @@ module.exports = {
         use: [{
           loader: MiniCssExtractPlugin.loader,
           options: {
-            // 这个表示在css文件里但凡用到地址的地方在其前面加个目录'../'，这个是为了能找到图片
+            // 这个表示在css文件里但凡用到地址的地方在其前面加个目录'../'，即公共地址, 这个是为了能找到图片
             // 如果不设置, 则背景图地址为 url(xxx.png)
             publicPath: '../'
           }
         }, "css-loader"] //代替style-loader
+      },
+      {
+        test: /\.less$/,
+        use: [ //把less编译到css文件里
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '../'
+            }
+          },
+          'css-loader', //注意顺序
+          'less-loader'
+        ]
       },
       {
         test: /\.(jpg|png|gif)$/, //找到三种格式中的任意一种
@@ -83,6 +97,7 @@ module.exports = {
         }]
         //use:'url-loader?limit=50000&outputPath=images'    //loader的另一种写法，与get请求方式相同
       },
+      // 用于解决html文件内的img load问题
       {
         test: /\.(html)$/,
         use: {
@@ -93,6 +108,20 @@ module.exports = {
             minimize: true
           }
         }
+      },
+      // babel js loader
+      {
+        test: /\.js$/,
+        use: [{
+          loader: 'babel-loader',
+          options: { //env针对的是ES的版本，它会自动选择。react针对的就是react
+            presets: ['env']
+          }
+        }],
+        //不去检查node_modules里的内容，那里的js太多了，会非常慢
+        exclude: /node_modules/,
+        //直接规定查找的范围
+        include: path.resolve(__dirname, 'src/js'),
       }
     ]
   },
