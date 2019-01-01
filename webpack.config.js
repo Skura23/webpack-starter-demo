@@ -2,7 +2,8 @@ const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-
+// const LiveReloadPlugin = require('webpack-livereload-plugin');
+const BrowserSyncPlugin = require('browser-sync-webpack-plugin')
 
 module.exports = {
   entry: {
@@ -48,7 +49,22 @@ module.exports = {
     new MiniCssExtractPlugin({
       // 指生成css文件夹, 文件在此文件夹内; 文件目录会放入output.path里
       filename: 'css/[name].css'
+    }), 
+    new BrowserSyncPlugin({
+      // browse to http://localhost:3000/ during development,
+      // ./public directory is being served
+      host: 'localhost',
+      port: 3010,
+      server: { baseDir: ['dist'] }
     })
+    // new LiveReloadPlugin({
+    //   // 自定义livereload服务器端口
+    //   port: 35888,
+    //   // 动态加载script用于html也被打包的项目, 若只是css js文件则不需要
+    //   appendScriptTag: true,
+    //   // delay: 1000
+    //   // hostname: 'localhost:3572'
+    // })
   ],
   module: {
     rules: [
@@ -114,9 +130,9 @@ module.exports = {
         test: /\.js$/,
         use: [{
           loader: 'babel-loader',
-          options: { //env针对的是ES的版本，它会自动选择。react针对的就是react
-            presets: ['env']
-          }
+          // options: { //env针对的是ES的版本，它会自动选择。react针对的就是react
+          //   presets: ['env']
+          // }
         }],
         //不去检查node_modules里的内容，那里的js太多了，会非常慢
         exclude: /node_modules/,
@@ -129,6 +145,9 @@ module.exports = {
     host: 'localhost', //服务器的ip地址
     port: 1573, //端口
     open: true, //自动打开页面
+    openPage: '/dist', //open时的页面地址
+    // publicPath: '/dist/',
+    // proxy: 'http://localhost:3572/'
     // hrm(无刷新) Live-reloading(刷新)
     // hot:true
   }
